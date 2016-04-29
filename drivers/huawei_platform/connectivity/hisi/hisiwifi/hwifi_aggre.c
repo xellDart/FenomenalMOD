@@ -319,7 +319,8 @@ int32 hwifi_set_amsdu(struct cfg_struct *cfg, struct aggre_cfg_param *param)
 
     HWIFI_ASSERT(NULL != cfg);
 
-    if(param->amsdu_action_type == A_MSDU_START)
+    if(param->amsdu_action_type == A_MSDU_START)
+
     {
         msg_size = sizeof(struct set_start_amsdu_msg);
         if (msg_size > MAX_MSG_LEN)
@@ -888,7 +889,7 @@ int32 wl_aggre_mode_lock_set(struct cfg_struct *cfg, uint8 enabled)
     spin_lock_bh(&cfg->aggre_info.lock);
     do
     {
-        if(!enabled == cfg->aggre_info.aggr_start)
+        if((!enabled) == cfg->aggre_info.aggr_start)
         {
             HWIFI_DEBUG("agree already %s", !enabled?"start":"stop");
             ret = TRUE;
@@ -1407,7 +1408,7 @@ STATIC void hwifi_data_rate_timeout(unsigned long data)
     {
         ht_40M_flag = cfg->rate.flags & RATE_INFO_FLAGS_40_MHZ_WIDTH;
 
-        /* 说明支持40M信道 */
+        /* 说\C3\F7支\B3\D640M\D0诺\C0 */
         if (ht_40M_flag && cfg->sta_info.fc_enabled)
         {
             g_aggr_num_rate_up    = (M40M_AGGR_NUM_RATE_UP * 1000000 / 8)*10;
@@ -1419,7 +1420,7 @@ STATIC void hwifi_data_rate_timeout(unsigned long data)
             g_aggr_num_rate_down  = (M20M_AGGR_NUM_RATE_DOWN * 1000000 / 8)*10;
         }
 
-        /* 按10s统计 */
+        /* \B0\B410s统\BC\C6 */
         if(g_count_aggre < 10)
         {
             g_count_aggre++;

@@ -3237,10 +3237,6 @@ need_resched:
 		rq->curr = next;
 		++*switch_count;
 
-#ifdef CONFIG_HUAWEI_MSG_POLICY
-		update_msg_stat(cpu, prev, next);
-#endif
-
 		context_switch(rq, prev, next); /* unlocks the rq */
 		/*
 		 * The context switch have flipped the stack from under us
