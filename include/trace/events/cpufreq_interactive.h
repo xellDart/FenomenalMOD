@@ -110,3 +110,4 @@ TRACE_EVENT(cpufreq_interactive_unboost,
 
 /* This part must be outside protection */
 #include <trace/define_trace.h>
+

@@ -1,7 +1,5 @@
 #Makefile for Hisilicon Wi-Fi Chip Hi1101
 
-CFLAGS =
-
 EXTRA_CFLAGS = $(CFLAGS)  \
 		   -DHi110X_VERSION_ROM \
 
