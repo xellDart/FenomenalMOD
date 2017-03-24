@@ -65,12 +65,29 @@ static short lowmem_adj[6] = {
 };
 static int lowmem_adj_size = 6;
 static int lowmem_minfree[6] = {
-	3 *  512,	/* Foreground App: 	6 MB	*/
+	 3 *  512,	/* Foreground App: 	6 MB	*/
 	 2 * 1024,	/* Visible App: 	8 MB	*/
 	 4 * 1024,	/* Secondary Server: 	16 MB	*/
 	16 * 1024,	/* Hidden App: 		64 MB	*/
+	20 * 1024,	/* 80MB */
 	28 * 1024,	/* Content Provider: 	112 MB	*/
 	32 * 1024,	/* Empty App: 		128 MB	*/
+};
+static int lowmem_minfree_screen_off[6] = {
+	3 * 512,	/* 6MB */
+	2 * 1024,	/* 8MB */
+	4 * 1024,	/* 16MB */
+	16 * 1024,	/* 64MB */
+	20 * 1024,	/* 80MB */
+	28 * 1024,	/* 112MB */
+};
+static int lowmem_minfree_screen_on[6] = {
+	3 * 512,	/* 6MB */
+	2 * 1024,	/* 8MB */
+	4 * 1024,	/* 16MB */
+	16 * 1024,	/* 64MB */
+	20 * 1024,	/* 80MB */
+	28 * 1024,	/* 112MB */
 };
 static int lowmem_minfree_size = 6;
 static int lmk_fast_run = 1;
@@ -88,27 +105,29 @@ static unsigned long lowmem_deathpending_timeout;
 
 static bool avoid_to_kill(uid_t uid)
 {
-	/* 
-	 * uid info
-	 * uid == 0 > root
-	 * uid == 1001 > radio
-	 * uid == 1002 > bluetooth
-	 * uid == 1010 > wifi
-	 * uid == 1014 > dhcp
-	 */
-	if (uid == 0 || uid == 1001 || uid == 1002 || uid == 1010 ||
-			uid == 1014)
+	if (uid == 0 || /* root */
+		uid == 1001 || /* radio */
+		uid == 1002 || /* bluetooth */
+		uid == 1010 || /* wifi */
+		uid == 1012 || /* install */
+		uid == 1013 || /* media */
+		uid == 1014 || /* dhcp */
+		uid == 1017 || /* keystore */
+		uid == 1019)	/* drm */
+	{
 		return 1;
+	}
 	return 0;
 }
 
 static bool protected_apps(char *comm)
 {
 	if (strcmp(comm, "d.process.acore") == 0 ||
-			strcmp(comm, "ndroid.systemui") == 0 ||
-			strcmp(comm, "ndroid.contacts") == 0 ||
-			strcmp(comm, "system:ui") == 0)
+		strcmp(comm, "ndroid.systemui") == 0 ||
+		strcmp(comm, "ndroid.contacts") == 0 ||
+		strcmp(comm, "d.process.media") == 0) {
 		return 1;
+	}
 	return 0;
 }
 
@@ -335,6 +354,8 @@ static int lowmem_shrink(struct shrinker *s, struct shrink_control *sc)
 {
 	struct task_struct *tsk;
 	struct task_struct *selected = NULL;
+	const struct cred *cred = current_cred(), *pcred;
+	unsigned int uid = 0;
 	const struct cred *pcred;
 	unsigned int uid = 0;
 	int rem = 0;
@@ -532,8 +553,28 @@ static struct shrinker lowmem_shrinker = {
 	.seeks = DEFAULT_SEEKS * 16
 };
 
+static void low_mem_early_suspend(struct power_suspend *handler)
+{
+	if (lowmem_auto_oom) {
+		memcpy(lowmem_minfree_screen_on, lowmem_minfree, sizeof(lowmem_minfree));
+		memcpy(lowmem_minfree, lowmem_minfree_screen_off, sizeof(lowmem_minfree_screen_off));
+	}
+}
+
+static void low_mem_late_resume(struct power_suspend *handler)
+{
+	if (lowmem_auto_oom)
+		memcpy(lowmem_minfree, lowmem_minfree_screen_on, sizeof(lowmem_minfree_screen_on));
+}
+
+static struct power_suspend low_mem_suspend = {
+	.suspend = low_mem_early_suspend,
+	.resume = low_mem_late_resume,
+};
+
 static int __init lowmem_init(void)
 {
+	
 	register_shrinker(&lowmem_shrinker);
 	return 0;
 }
@@ -712,10 +753,13 @@ module_param_array_named(adj, lowmem_adj, short, &lowmem_adj_size,
 #endif
 module_param_array_named(minfree, lowmem_minfree, uint, &lowmem_minfree_size,
 			 S_IRUGO | S_IWUSR);
+module_param_array_named(minfree_screen_off, lowmem_minfree_screen_off, uint, &lowmem_minfree_size,
+			 S_IRUGO | S_IWUSR);
 module_param_named(debug_level, lowmem_debug_level, uint, S_IRUGO | S_IWUSR);
 module_param_named(lmk_fast_run, lmk_fast_run, int, S_IRUGO | S_IWUSR);
 module_param_named(kill_count, lowmem_kill_count, ulong, S_IRUGO | S_IWUSR);
 module_param_named(free_mem, lowmem_free_mem, ulong, S_IRUGO | S_IWUSR);
+odule_param_named(auto_oom, lowmem_auto_oom, uint, S_IRUGO | S_IWUSR);
 
 module_init(lowmem_init);
 module_exit(lowmem_exit);
