@@ -36,6 +36,9 @@
 #include <linux/ftrace.h>
 #include <linux/ratelimit.h>
 
+#define CREATE_TRACE_POINTS
+#include <trace/events/oom.h>
+
 int sysctl_panic_on_oom;
 int sysctl_oom_kill_allocating_task;
 int sysctl_oom_dump_tasks = 1;
