@@ -1047,17 +1047,17 @@ static int __init logger_init(void)
 {
 	int ret;
 #ifdef FINAL_RELEASE_MODE
-	ret = create_log(LOGGER_LOG_MAIN, 128*1024);
+	ret = create_log(LOGGER_LOG_MAIN, 32*1024);
 #else
-	ret = create_log(LOGGER_LOG_MAIN, 1024*1024);
+	ret = create_log(LOGGER_LOG_MAIN, 32*1024);
 #endif
 	if (unlikely(ret))
 		goto out;
 
 #ifdef FINAL_RELEASE_MODE
-	ret = create_log(LOGGER_LOG_EVENTS, 128*1024);
+	ret = create_log(LOGGER_LOG_EVENTS, 32*1024);
 #else
-	ret = create_log(LOGGER_LOG_EVENTS, 256*1024);
+	ret = create_log(LOGGER_LOG_EVENTS, 32*1024);
 #endif
 	if (unlikely(ret))
 		goto out;
@@ -1065,15 +1065,15 @@ static int __init logger_init(void)
 #ifdef FINAL_RELEASE_MODE
 	ret = create_log(LOGGER_LOG_RADIO, 16*1024);
 #else
-	ret = create_log(LOGGER_LOG_RADIO, 256*1024);
+	ret = create_log(LOGGER_LOG_RADIO, 32*1024);
 #endif
 	if (unlikely(ret))
 		goto out;
 
 #ifdef FINAL_RELEASE_MODE
-	ret = create_log(LOGGER_LOG_SYSTEM, 64*1024);
+	ret = create_log(LOGGER_LOG_SYSTEM, 32*1024);
 #else
-	ret = create_log(LOGGER_LOG_SYSTEM, 1024*1024);
+	ret = create_log(LOGGER_LOG_SYSTEM, 32*1024);
 #endif
 	if (unlikely(ret))
 		goto out;
@@ -1082,7 +1082,7 @@ static int __init logger_init(void)
 	if (unlikely(ret))
 		goto out;
 #if defined (CONFIG_LOG_JANK)
-	ret = create_log(LOGGER_LOG_JANK, 64*1024);
+	ret = create_log(LOGGER_LOG_JANK, 32*1024);
 	if (unlikely(ret))
 		goto out;
 #endif

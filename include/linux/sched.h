@@ -1682,9 +1682,6 @@ extern void thread_group_cputime_adjusted(struct task_struct *p, cputime_t *ut, 
 
 extern int task_free_register(struct notifier_block *n);
 extern int task_free_unregister(struct notifier_block *n);
-extern int sched_set_window(u64 window_start, unsigned int window_size);
-static inline void sched_set_io_is_busy(int val) {};
-extern unsigned long sched_get_busy(int cpu);
 
 /*
  * Per process flags
@@ -2723,8 +2720,6 @@ static inline void set_task_cpu(struct task_struct *p, unsigned int cpu)
 }
 
 #endif /* CONFIG_SMP */
-
-extern struct atomic_notifier_head load_alert_notifier_head;
 
 extern long sched_setaffinity(pid_t pid, const struct cpumask *new_mask);
 extern long sched_getaffinity(pid_t pid, struct cpumask *mask);
